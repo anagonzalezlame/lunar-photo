@@ -1,7 +1,7 @@
 <title>Lunar Photo</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMjQiIGZpbGw9IiNGQkYzREIiIHN0cm9rZT0iIzE3MTUxMyIgc3Ryb2tlLXdpZHRoPSI0Ii8+PGNpcmNsZSBjeD0iNDQiIGN5PSIyMiIgcj0iMjAiIGZpbGw9IiNGQkZCRkEiLz48L3N2Zz4K">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PG1hc2sgaWQ9Im0iPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjYiIHI9IjIyIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iMTgiIGN5PSI0NyIgcj0iMi42IiBmaWxsPSIjMDAwIi8+PC9tYXNrPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzQiIHI9IjI0IiBmaWxsPSIjMTcxNTEzIiBtYXNrPSJ1cmwoI20pIi8+PC9zdmc+">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Inter:wght@700;800&display=swap">
 <style>
   :root{
     --canvas:#FBFBFA;
@@ -41,7 +41,8 @@
     display:flex; align-items:center; justify-content:space-between;
     padding:26px 28px; border-bottom:1px solid var(--line);
   }
-  .brand{ font-family:"JetBrains Mono", monospace; font-size:0.78rem; letter-spacing:0.08em; color:var(--ink); }
+  .brand{ display:inline-flex; align-items:center; gap:7px; font-family:"Inter", sans-serif; font-weight:800; font-size:1rem; letter-spacing:-0.02em; color:var(--ink); }
+  .brand .mark{ width:17px; height:17px; flex:none; }
   .pill{
     display:inline-flex; align-items:center; font-family:"JetBrains Mono", monospace;
     font-size:0.65rem; letter-spacing:0.07em; text-transform:uppercase;
@@ -148,7 +149,7 @@
   .sources a:hover{ border-color:var(--ink); }
 
   footer{ padding:44px 28px 64px; text-align:center; }
-  footer .brand{ display:block; margin-bottom:8px; }
+  footer .brand{ display:inline-flex; margin-bottom:8px; }
   footer p{ font-size:0.8rem; color:var(--ink-soft); margin:0; max-width:460px; margin-inline:auto; }
 
   @media (max-width:720px){
@@ -157,11 +158,20 @@
   }
 </style>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <mask id="crescent-site" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <rect width="64" height="64" fill="#fff"/>
+      <circle cx="40" cy="26" r="22" fill="#000"/>
+      <circle cx="18" cy="47" r="2.6" fill="#000"/>
+    </mask>
+  </defs>
+</svg>
 <div class="glow" aria-hidden="true"></div>
 
 <main>
   <header class="top">
-    <span class="brand">LUNAR.PHOTO</span>
+    <span class="brand"><svg class="mark" viewBox="0 0 64 64" role="img" aria-label="lunar.photo mark"><circle cx="32" cy="34" r="24" fill="currentColor" mask="url(#crescent-site)"/></svg>lunar.photo</span>
     <span class="pill" style="background:var(--blue-bg); color:var(--blue-ink);">NASA Space Apps 2026</span>
   </header>
 
@@ -339,7 +349,7 @@
   </section>
 
   <footer>
-    <span class="brand">LUNAR.PHOTO</span>
+    <span class="brand"><svg class="mark" viewBox="0 0 64 64" role="img" aria-label="lunar.photo mark"><circle cx="32" cy="34" r="24" fill="currentColor" mask="url(#crescent-site)"/></svg>lunar.photo</span>
     <p>Submission for the NASA Space Apps Challenge 2026 — "Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars"</p>
   </footer>
 </main>
