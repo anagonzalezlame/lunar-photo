@@ -1,0 +1,292 @@
+<title>Lunar Photo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --canvas:#FBFBFA;
+    --surface:#FFFFFF;
+    --line:#E7E5E1;
+    --ink:#171513;
+    --ink-soft:#7A756D;
+    --blue-bg:#E1F0FA;
+    --blue-ink:#1F5E8C;
+    --yellow-bg:#FBF3DB;
+    --yellow-ink:#8A5E00;
+    --green-bg:#EAF1E8;
+    --green-ink:#386138;
+    --red-bg:#FAEAE9;
+    --red-ink:#9A3530;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--canvas);
+    color:var(--ink);
+    font-family:"Public Sans", system-ui, sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .glow{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(640px 420px at 50% -10%, rgba(138,94,0,0.05), transparent 70%);
+  }
+  main{ position:relative; z-index:1; }
+  .wrap{ max-width:920px; margin:0 auto; padding:0 28px; }
+
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:26px 28px; border-bottom:1px solid var(--line);
+  }
+  .brand{ font-family:"JetBrains Mono", monospace; font-size:0.78rem; letter-spacing:0.08em; color:var(--ink); }
+  .pill{
+    display:inline-flex; align-items:center; font-family:"JetBrains Mono", monospace;
+    font-size:0.65rem; letter-spacing:0.07em; text-transform:uppercase;
+    padding:6px 12px; border-radius:999px; background:var(--yellow-bg); color:var(--yellow-ink);
+  }
+
+  .hero{ padding:88px 28px 64px; text-align:center; }
+  .hero .pill{ margin:0 0 28px; }
+
+  .orbit-diagram{ display:block; margin:0 auto 36px; overflow:visible; }
+  .orbit-group{ transform-origin:150px 150px; animation:orbit 22s linear infinite; }
+  @keyframes orbit{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .orbit-group{ animation:none; } }
+  h1{
+    font-family:"Newsreader", serif; font-weight:500; font-size:clamp(2.6rem, 7vw, 4.6rem);
+    margin:0 0 22px; letter-spacing:-0.02em; line-height:1.08; text-wrap:balance;
+  }
+  h1 .amp{ font-style:italic; color:var(--ink-soft); }
+  .thesis{ max-width:560px; margin:0 auto 52px; color:var(--ink-soft); font-size:1.08rem; text-wrap:balance; }
+
+  .score-hero{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .score-num{ font-family:"Newsreader", serif; font-weight:500; font-size:clamp(3.4rem, 11vw, 6rem); line-height:1; }
+  .score-label{ font-family:"JetBrains Mono", monospace; font-size:0.72rem; letter-spacing:0.08em; color:var(--ink-soft); text-transform:uppercase; }
+
+  section{ padding:72px 0; border-top:1px solid var(--line); }
+  h2{ font-family:"Newsreader", serif; font-weight:500; font-size:1.8rem; margin:0 0 10px; letter-spacing:-0.01em; text-wrap:balance; }
+  .section-sub{ color:var(--ink-soft); font-size:0.98rem; margin:0 0 36px; max-width:560px; }
+
+  .reveal{ opacity:0; transform:translateY(12px); transition:opacity 600ms cubic-bezier(.16,1,.3,1), transform 600ms cubic-bezier(.16,1,.3,1); }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  .bento{ display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .bento-card{ background:var(--surface); padding:28px 24px; }
+  .bento-card .tag{ display:inline-block; font-family:"JetBrains Mono", monospace; font-size:0.62rem; letter-spacing:0.07em; text-transform:uppercase; padding:4px 10px; border-radius:999px; margin-bottom:16px; }
+  .tag.blue{ background:var(--blue-bg); color:var(--blue-ink); }
+  .tag.yellow{ background:var(--yellow-bg); color:var(--yellow-ink); }
+  .tag.green{ background:var(--green-bg); color:var(--green-ink); }
+  .bento-card .num{ font-family:"Newsreader", serif; font-size:2.3rem; font-weight:500; margin:0 0 4px; }
+  .bento-card .weight{ font-family:"JetBrains Mono", monospace; font-size:0.72rem; color:var(--ink-soft); margin:0 0 14px; }
+  .bento-card p{ margin:0; font-size:0.9rem; color:var(--ink-soft); }
+
+  .profile-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:28px 24px 18px; }
+  .profile-caption{ display:flex; justify-content:space-between; font-family:"JetBrains Mono", monospace; font-size:0.68rem; color:var(--ink-soft); margin-top:14px; }
+
+  .photos{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .photo-card img{ display:block; width:100%; height:260px; object-fit:cover; }
+  .photo-card .cap{ background:var(--surface); padding:16px 18px; }
+  .photo-card .cap .place{ font-family:"Newsreader", serif; font-size:1.05rem; margin:0 0 4px; }
+  .photo-card .cap .credit{ font-family:"JetBrains Mono", monospace; font-size:0.66rem; color:var(--ink-soft); margin:0; }
+  @media (max-width:640px){ .photos{ grid-template-columns:1fr; } }
+
+  .cards{ display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .card{ background:var(--surface); padding:28px 26px; }
+  .card h3{ font-family:"Newsreader", serif; font-weight:500; font-size:1.3rem; margin:0 0 16px; }
+  .card .row{ display:grid; grid-template-columns:120px 1fr; gap:16px; margin-bottom:14px; align-items:start; }
+  .card .row:last-child{ margin-bottom:0; }
+  .card .k{ display:inline-flex; align-self:start; font-family:"JetBrains Mono", monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; padding:4px 10px; border-radius:999px; }
+  .card .k.works{ background:var(--green-bg); color:var(--green-ink); }
+  .card .k.breaks{ background:var(--red-bg); color:var(--red-ink); }
+  .card p{ margin:0; font-size:0.94rem; color:var(--ink-soft); }
+
+  .quote{ border-top:1px solid var(--line); padding-top:36px; }
+  .quote p{
+    font-family:"Public Sans", sans-serif; font-size:1rem; font-weight:400;
+    color:var(--ink-soft); line-height:1.6; margin:0 0 14px; text-wrap:balance; max-width:620px;
+  }
+  .quote p:last-child{ margin-bottom:0; }
+  .quote p strong{ color:var(--ink); font-weight:600; }
+  .quote p em{ font-style:normal; background:var(--yellow-bg); color:var(--yellow-ink); padding:0 4px; border-radius:4px; }
+  .quote .label{ display:block; font-family:"JetBrains Mono", monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:16px; }
+
+  .sources{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; }
+  .sources li{ font-size:0.9rem; color:var(--ink-soft); border-top:1px solid var(--line); padding:14px 0; }
+  .sources li:first-child{ border-top:none; }
+  .sources a{ color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line); }
+  .sources a:hover{ border-color:var(--ink); }
+
+  footer{ padding:44px 28px 64px; text-align:center; }
+  footer .brand{ display:block; margin-bottom:8px; }
+  footer p{ font-size:0.8rem; color:var(--ink-soft); margin:0; max-width:460px; margin-inline:auto; }
+
+  @media (max-width:720px){
+    .bento{ grid-template-columns:1fr; }
+    .card .row{ grid-template-columns:1fr; gap:6px; }
+  }
+</style>
+
+<div class="glow" aria-hidden="true"></div>
+
+<main>
+  <header class="top">
+    <span class="brand">LUNAR.PHOTO</span>
+    <span class="pill" style="background:var(--blue-bg); color:var(--blue-ink);">NASA Space Apps 2026</span>
+  </header>
+
+  <section class="hero" style="border-top:none;">
+    <svg class="orbit-diagram" viewBox="0 0 300 300" width="170" height="170" role="img" aria-label="Moon orbiting Earth">
+      <circle class="orbit-path" cx="150" cy="150" r="128" fill="none" stroke="#E7E5E1" stroke-width="1" stroke-dasharray="3 6"/>
+      <circle class="earth" cx="150" cy="150" r="54" fill="#E1F0FA" stroke="#171513" stroke-width="1.5"/>
+      <path d="M 108 150 A 54 54 0 0 0 150 204" fill="none" stroke="#171513" stroke-width="1" opacity="0.25"/>
+      <g class="orbit-group">
+        <circle class="moon" cx="150" cy="22" r="12" fill="#FBF3DB" stroke="#171513" stroke-width="1.5"/>
+      </g>
+    </svg>
+    <span class="pill">Terrestrial Analog &middot; The Next Frontier</span>
+    <h1>Shackleton <span class="amp">&amp;</span> Svalbard</h1>
+    <p class="thesis">The rim of Shackleton crater, at the Moon's south pole, compared against the Midtre Lovénbreen glacier near Ny-Ålesund — across terrain, light, and ice — to find where on Earth to test what a permanent lunar base will need.</p>
+    <div class="score-hero">
+      <span class="score-num" id="scoreNum">0%</span>
+      <span class="score-label">Weighted overall similarity</span>
+    </div>
+  </section>
+
+  <section class="wrap reveal">
+    <h2>The score, by dimension</h2>
+    <p class="section-sub">A 0–1 index per dimension, weighted by how critical it is for a permanent lunar base.</p>
+    <div class="bento">
+      <div class="bento-card">
+        <span class="tag blue">Water ice &middot; weight 0.4</span>
+        <p class="num">1.00</p>
+        <p class="weight">100% match</p>
+        <p>The lunar range (5–10%) sits entirely inside Svalbard's permafrost range (5–40%).</p>
+      </div>
+      <div class="bento-card">
+        <span class="tag green">Terrain &middot; weight 0.3</span>
+        <p class="num">0.72</p>
+        <p class="weight">72% match</p>
+        <p>The glacier floor is gentle (~5°), but its lateral moraines and the slopes of nearby Zeppelinfjellet run 25–30° — close to Shackleton's walls. Mobility tests belong there, not on the flat ice.</p>
+      </div>
+      <div class="bento-card">
+        <span class="tag yellow">Illumination &middot; weight 0.3</span>
+        <p class="num">0.31</p>
+        <p class="weight">31% match</p>
+        <p>115 days of polar night (Oct–Feb) over 365 days of permanent shadow on the Moon. The analogy holds for that window only.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap reveal">
+    <h2>Compared profile</h2>
+    <p class="section-sub">Same distance/elevation axis: Shackleton's bowl (true permanent shadow) against the much gentler glacier valley profile (seasonal polar night, not eternal shadow).</p>
+    <div class="profile-card">
+      <svg viewBox="0 0 760 240" width="100%" height="auto" role="img" aria-label="Topographic profile of Shackleton compared with Midtre Lovénbreen">
+        <line x1="20" y1="195" x2="740" y2="195" stroke="#E7E5E1" stroke-width="1"/>
+        <path d="M 60 195 L 150 55 C 220 140, 260 140, 330 55 L 420 195 Z" fill="#171513" opacity="0.06"/>
+        <path d="M 60 195 L 150 55 C 220 140, 260 140, 330 55 L 420 195" fill="none" stroke="#171513" stroke-width="1.6"/>
+        <text x="240" y="122" fill="#7A756D" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="middle">permanent shadow</text>
+        <path d="M 460 195 L 540 140 C 580 130, 650 130, 700 105" fill="none" stroke="#1F5E8C" stroke-width="2"/>
+        <text x="600" y="185" fill="#7A756D" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="middle">polar night (seasonal)</text>
+      </svg>
+      <div class="profile-caption">
+        <span>Shackleton — Ø 21 km, −4,200 m, walls ~30°</span>
+        <span>Midtre Lovénbreen — 4 km, 60–650 m a.s.l., ~4.6°</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap reveal">
+    <h2>Both sites, in frame</h2>
+    <p class="section-sub">The abstraction above, grounded in actual imagery of each place.</p>
+    <div class="photos">
+      <div class="photo-card">
+        <img src="/_blob/27c86a1c79e5511b0e8d63b99f0068aa" alt="Shackleton crater at the lunar south pole, LROC/ShadowCam mosaic" loading="lazy">
+        <div class="cap">
+          <p class="place">Shackleton crater, lunar south pole</p>
+          <p class="credit">LROC &amp; ShadowCam mosaic — NASA / KARI / ASU</p>
+        </div>
+      </div>
+      <div class="photo-card">
+        <img src="/_blob/62fdcc550be52d45cc5cfc15084eb990" alt="Midtre Lovénbreen glacier, Kongsfjorden, Svalbard" loading="lazy">
+        <div class="cap">
+          <p class="place">Midtre Lovénbreen, Kongsfjorden</p>
+          <p class="credit">Photo: Bjoertvedt — CC BY-SA 3.0, Wikimedia Commons</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap reveal">
+    <h2>Where it holds, where it breaks</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Terrain</h3>
+        <div class="row"><span class="k works">Holds</span><p>Both demand crossing irregular ground where ice acts as cement between sediments — key for testing rovers and drilling equipment.</p></div>
+        <div class="row"><span class="k breaks">Breaks down</span><p>Shackleton is an impact basin with 30° walls; the glacier floor itself is much gentler (~5°). The closer match sits at its moraines and the Zeppelinfjellet slopes nearby (25–30°).</p></div>
+      </div>
+      <div class="card">
+        <h3>Illumination and shadow</h3>
+        <div class="row"><span class="k works">Holds</span><p>Forces teams to operate with prolonged artificial light, sharp temperature drops, and power management without sun for 100+ straight days.</p></div>
+        <div class="row"><span class="k breaks">Breaks down</span><p>Shackleton's interior has sat at −200°C in total darkness for billions of years; Svalbard has a seasonal cycle that brings back full daylight in summer.</p></div>
+      </div>
+      <div class="card">
+        <h3>Water ice</h3>
+        <div class="row"><span class="k works">Holds</span><p>The lunar regolith's theoretical ice content (5–10% by weight) matches the driest bands of Bayelva's permafrost.</p></div>
+        <div class="row"><span class="k breaks">Breaks down</span><p>Lunar ice is mixed with abrasive dust in a cryogenic vacuum; Svalbard's permafrost interacts with summer liquid water and a dense atmosphere.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap reveal">
+    <div class="quote">
+      <span class="label">Framing</span>
+      <p>Svalbard isn't a geological clone of Shackleton — it's a place to catch engineering problems early, before simulating cryogenic vacuum and extreme slopes.</p>
+      <p>This isn't a new idea: NASA and ESA ran the <strong>Arctic Mars Analog Svalbard Expedition (AMASE)</strong> from 2003–2011, testing the SAM and CheMin instruments that later flew on the Curiosity rover. The <strong>Haughton-Mars Project</strong> (NASA/SETI Institute, Devon Island) used the same logic for suit and rover logistics in polar isolation.</p>
+    </div>
+  </section>
+
+  <section class="wrap reveal">
+    <h2>Sources</h2>
+    <ul class="sources">
+      <li>Shackleton dimensions and slope — <a href="https://en.wikipedia.org/wiki/Shackleton_(crater)" target="_blank" rel="noopener">Wikipedia, Shackleton (crater)</a>, LRO/Clementine studies.</li>
+      <li>Shackleton water ice — Thomson et al. 2012, <em>An upper limit for ice in Shackleton crater as revealed by LRO Mini-RF orbital radar</em>, Geophysical Research Letters.</li>
+      <li>Ny-Ålesund light cycle — <a href="https://en.wikipedia.org/wiki/Climate_of_Svalbard" target="_blank" rel="noopener">Wikipedia, Climate of Svalbard</a>.</li>
+      <li>Midtre Lovénbreen glacier — <a href="https://www.swisseduc.ch/glaciers/svalbard/midtre_lovenbreen/index-en.html" target="_blank" rel="noopener">SwissEduc Glaciers Online</a>.</li>
+      <li>Bayelva / Kvadehuken permafrost — SESS Report 2020, Ny-Ålesund Integrated CryoNet Cluster (Global Cryosphere Watch).</li>
+      <li>Precedent — Arctic Mars Analog Svalbard Expedition (AMASE), NASA/ESA, 2003–2011.</li>
+      <li>Precedent — Haughton-Mars Project, NASA/SETI Institute, Devon Island.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span class="brand">LUNAR.PHOTO</span>
+    <p>Submission for the NASA Space Apps Challenge 2026 — "Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars"</p>
+  </footer>
+</main>
+
+<script>
+  const target = 70.9;
+  const el = document.getElementById('scoreNum');
+  const start = performance.now();
+  const dur = 1200;
+  function tick(now){
+    const p = Math.min(1, (now - start) / dur);
+    el.textContent = (target * p).toFixed(1) + '%';
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = '73.7%';
+  }
+  requestAnimationFrame(tick);
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
