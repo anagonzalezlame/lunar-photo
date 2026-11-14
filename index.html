@@ -85,7 +85,11 @@
   .wslider{ -webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:2px; background:var(--line); margin-top:16px; accent-color:#171513; cursor:pointer; }
   .wslider::-webkit-slider-thumb{ -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#171513; cursor:pointer; }
   .wslider::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:#171513; border:none; cursor:pointer; }
-  .slider-hint{ font-size:0.84rem; color:var(--ink-soft); margin:18px 0 0; text-align:center; }
+  .live-score{ display:flex; align-items:baseline; justify-content:center; gap:10px; margin:28px 0 0; }
+  .live-score-label{ font-family:"JetBrains Mono", monospace; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .live-score-num{ font-family:"Newsreader", serif; font-weight:500; font-size:2.2rem; color:var(--ink); transition:color 0.2s ease; }
+  .live-score-num.bump{ color:#8A5E00; }
+  .slider-hint{ font-size:0.84rem; color:var(--ink-soft); margin:10px 0 0; text-align:center; }
   .slider-hint button{ font-family:"JetBrains Mono", monospace; font-size:0.72rem; background:none; border:none; border-bottom:1px solid var(--ink-soft); color:var(--ink); cursor:pointer; padding:0 0 1px; margin-left:4px; }
   .slider-hint button:hover{ border-color:var(--ink); }
 
@@ -205,7 +209,11 @@
         <input type="range" class="wslider" min="0" max="100" value="30" id="wLight" aria-label="Illumination weight, percent" data-score="0.31">
       </div>
     </div>
-    <p class="slider-hint">Drag the weights — the score at the top recalculates live. <button type="button" id="resetWeights">Reset to our weights</button></p>
+    <div class="live-score">
+      <span class="live-score-label">Your score</span>
+      <span class="live-score-num" id="scoreNumLocal">70.9%</span>
+    </div>
+    <p class="slider-hint">Drag the weights above — the score updates live. <button type="button" id="resetWeights">Reset to our weights</button></p>
   </section>
 
   <section class="wrap reveal">
@@ -338,6 +346,7 @@
 
 <script>
   const scoreEl = document.getElementById('scoreNum');
+  const scoreLocalEl = document.getElementById('scoreNumLocal');
   const sliders = {
     ice: { input: document.getElementById('wIce'), label: document.getElementById('wIceLabel') },
     terrain: { input: document.getElementById('wTerrain'), label: document.getElementById('wTerrainLabel') },
@@ -356,19 +365,27 @@
     return total * 100;
   }
 
-  function renderScore(value){
-    scoreEl.textContent = value.toFixed(1) + '%';
+  let bumpTimer;
+  function renderScore(value, animateBump){
+    const text = value.toFixed(1) + '%';
+    scoreEl.textContent = text;
+    scoreLocalEl.textContent = text;
+    if (animateBump){
+      scoreLocalEl.classList.add('bump');
+      clearTimeout(bumpTimer);
+      bumpTimer = setTimeout(() => scoreLocalEl.classList.remove('bump'), 220);
+    }
   }
 
   Object.values(sliders).forEach(s => {
-    s.input.addEventListener('input', () => renderScore(computeScore()));
+    s.input.addEventListener('input', () => renderScore(computeScore(), true));
   });
 
   document.getElementById('resetWeights').addEventListener('click', () => {
     sliders.ice.input.value = 40;
     sliders.terrain.input.value = 30;
     sliders.light.input.value = 30;
-    renderScore(computeScore());
+    renderScore(computeScore(), true);
   });
 
   const target = computeScore();
