@@ -1,0 +1,325 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lunar.photo Technical Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Inter:wght@700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --canvas:#FBFBFA; --surface:#FFFFFF; --line:#E7E5E1;
+    --ink:#171513; --ink-soft:#7A756D;
+    --blue-bg:#E1F0FA; --blue-ink:#1F5E8C;
+    --yellow-bg:#FBF3DB; --yellow-ink:#8A5E00;
+    --green-bg:#EAF1E8; --green-ink:#386138;
+    --red-bg:#FAEAE9; --red-ink:#9A3530;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--canvas); color:var(--ink);
+    font-family:"Public Sans", system-ui, sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 24px; }
+
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:24px 24px; border-bottom:1px solid var(--line);
+  }
+  .brand{ display:inline-flex; align-items:center; gap:7px; font-family:"Inter", sans-serif; font-weight:800; font-size:1rem; letter-spacing:-0.02em; color:var(--ink); text-decoration:none; }
+  .brand .mark{ width:17px; height:17px; flex:none; color:var(--ink); }
+  .back{ font-family:"JetBrains Mono", monospace; font-size:0.72rem; letter-spacing:0.05em; color:var(--ink-soft); text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:1px; }
+  .back:hover{ color:var(--ink); border-color:var(--ink-soft); }
+
+  .titleblock{ padding:64px 0 48px; border-bottom:1px solid var(--line); }
+  .eyebrow{ font-family:"JetBrains Mono", monospace; font-size:0.72rem; letter-spacing:0.09em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 16px; }
+  h1{ font-family:"Newsreader", serif; font-weight:500; font-size:clamp(2.2rem, 6vw, 3rem); margin:0 0 16px; letter-spacing:-0.015em; line-height:1.1; text-wrap:balance; }
+  .deck{ color:var(--ink-soft); font-size:1.08rem; max-width:58ch; text-wrap:balance; margin:0; }
+  .meta-row{ display:flex; gap:24px; margin-top:28px; font-family:"JetBrains Mono", monospace; font-size:0.74rem; color:var(--ink-soft); flex-wrap:wrap; }
+
+  section{ border-top:1px solid var(--line); }
+  .wrap.section-inner{ padding:56px 24px; }
+  h2{ font-family:"Newsreader", serif; font-weight:500; font-size:1.6rem; margin:0 0 8px; letter-spacing:-0.01em; text-wrap:balance; }
+  .section-sub{ color:var(--ink-soft); font-size:0.95rem; margin:0 0 32px; max-width:60ch; }
+  h3{ font-family:"Newsreader", serif; font-weight:500; font-size:1.15rem; margin:32px 0 10px; }
+  p{ margin:0 0 16px; }
+  p:last-child{ margin-bottom:0; }
+
+  .pullnote{
+    border-left:2px solid var(--blue-ink); background:var(--blue-bg);
+    padding:16px 20px; border-radius:0 10px 10px 0; font-size:0.92rem; line-height:1.6;
+    margin:24px 0;
+  }
+  .pullnote.yellow{ border-color:var(--yellow-ink); background:var(--yellow-bg); }
+  .pullnote strong{ font-weight:600; }
+
+  table{ width:100%; border-collapse:collapse; margin:20px 0; font-size:0.88rem; }
+  th{ font-family:"JetBrains Mono", monospace; font-size:0.68rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-soft); text-align:left; padding:0 14px 10px 0; border-bottom:1px solid var(--line); }
+  td{ padding:12px 14px 12px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr:last-child td{ border-bottom:none; }
+  .num-cell{ font-family:"JetBrains Mono", monospace; font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  .score-formula{
+    background:var(--ink); color:#E7E2D8; border-radius:12px; padding:20px 24px;
+    font-family:"JetBrains Mono", monospace; font-size:0.86rem; margin:20px 0; overflow-x:auto;
+  }
+
+  .sens-table td:nth-child(2){ font-family:"JetBrains Mono", monospace; font-variant-numeric:tabular-nums; }
+
+  .tag{ display:inline-flex; align-items:center; font-family:"JetBrains Mono", monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; padding:4px 10px; border-radius:999px; margin-right:8px; margin-bottom:4px; }
+  .tag.blue{ background:var(--blue-bg); color:var(--blue-ink); }
+  .tag.green{ background:var(--green-bg); color:var(--green-ink); }
+  .tag.yellow{ background:var(--yellow-bg); color:var(--yellow-ink); }
+  .tag.red{ background:var(--red-bg); color:var(--red-ink); }
+
+  .precedent-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:22px 24px; margin:16px 0; }
+  .precedent-card h4{ font-family:"Newsreader", serif; font-weight:500; font-size:1.05rem; margin:0 0 8px; }
+  .precedent-card p{ font-size:0.92rem; color:var(--ink-soft); margin:0; }
+
+  .timeline{ display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; margin:20px 0; }
+  .timeline-item{ background:var(--surface); padding:18px 22px; }
+  .timeline-item .yr{ font-family:"JetBrains Mono", monospace; font-size:0.72rem; color:var(--blue-ink); letter-spacing:0.04em; }
+  .timeline-item p{ margin:6px 0 0; font-size:0.9rem; }
+
+  .sources{ list-style:none; margin:0; padding:0; }
+  .sources li{ font-size:0.88rem; color:var(--ink-soft); border-top:1px solid var(--line); padding:13px 0; }
+  .sources li:first-child{ border-top:none; }
+  .sources a{ color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line); }
+  .sources a:hover{ border-color:var(--ink); }
+  .sources .src-cat{ font-family:"JetBrains Mono", monospace; font-size:0.66rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-soft); display:block; margin:28px 0 4px; }
+  .sources .src-cat:first-child{ margin-top:0; }
+
+  footer{ padding:48px 24px 72px; text-align:center; }
+  footer .brand{ justify-content:center; margin-bottom:10px; }
+  footer p{ font-size:0.82rem; color:var(--ink-soft); margin:0; max-width:460px; margin-inline:auto; }
+  footer .links{ margin-top:16px; display:flex; justify-content:center; gap:20px; font-family:"JetBrains Mono", monospace; font-size:0.74rem; }
+  footer .links a{ color:var(--ink-soft); text-decoration:none; border-bottom:1px solid var(--line); }
+  footer .links a:hover{ color:var(--ink); border-color:var(--ink-soft); }
+
+  @media (max-width:600px){
+    .wrap.section-inner{ padding:40px 20px; }
+    .titleblock{ padding:44px 0 36px; }
+    header.top{ padding:20px; flex-wrap:wrap; gap:10px; }
+    table, thead, tbody, tr{ display:block; }
+    th{ display:none; }
+    tr{ border-bottom:1px solid var(--line); padding:14px 0; }
+    tr:last-child{ border-bottom:none; }
+    td{ display:block; border:none; padding:2px 0; }
+    td::before{ content:attr(data-label); display:block; font-family:"JetBrains Mono", monospace; font-size:0.64rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <mask id="crescent-site" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <rect width="64" height="64" fill="#fff"/>
+      <circle cx="40" cy="26" r="22" fill="#000"/>
+      <circle cx="18" cy="47" r="2.6" fill="#000"/>
+    </mask>
+  </defs>
+</svg>
+
+<header class="top">
+  <a class="brand" href="https://www.lunar.photo/"><svg class="mark" viewBox="0 0 64 64"><circle cx="32" cy="34" r="24" fill="currentColor" mask="url(#crescent-site)"/></svg>lunar.photo</a>
+  <a class="back" href="https://www.lunar.photo/">&larr; back to the site</a>
+</header>
+
+<div class="titleblock">
+  <div class="wrap">
+    <p class="eyebrow">Technical report</p>
+    <h1>Shackleton &amp; Svalbard, in full</h1>
+    <p class="deck">The complete methodology, data, limitations, and sources behind the 70.9% similarity index — for anyone who wants to go past the summary.</p>
+    <div class="meta-row">
+      <span>NASA Space Apps Challenge 2026</span>
+      <span>"Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars"</span>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap section-inner">
+    <p class="eyebrow">01</p>
+    <h2>Methodology</h2>
+    <p class="section-sub">How the index is built, and why these three dimensions carry the weight they do.</p>
+
+    <p>The project frames Earth as an early, low-cost engineering test bed for permanent lunar base hardware — a <em>shift-left</em> approach, surfacing failures cheaply and early rather than inside a cryogenic vacuum chamber. Rather than seeking a geological clone of Shackleton crater, it identifies Svalbard as an operational proxy: a place real equipment can be tested under some of the same constraints a lunar south-pole mission will face.</p>
+
+    <p>The Similarity Index is a weighted average of three per-dimension scores (each 0–1), normalized linearly and treated as independent — no cross-interactions between terrain, ice, and light are modeled:</p>
+
+    <div class="score-formula">Score = (ice_score × 0.4) + (illumination_score × 0.3) + (terrain_score × 0.3)</div>
+
+    <h3>Why these weights</h3>
+    <p>Weights reflect how critical each factor is for a permanent base, not how well each one happens to score. Terrain and ice were both raised from an earlier draft (ice 0.5 → 0.4, terrain 0.2 → 0.3) after reasoning that mobility and energy are prerequisites: a rover that cannot descend a slope, or a habitat that loses power in extended darkness, never gets the chance to use any ice it finds. Illumination stayed at 0.3 throughout.</p>
+
+    <div class="pullnote"><strong>Methodology note (as submitted):</strong> "The proposed Similarity Index assumes a linear relationship in variable normalization and treats each dimension (terrain, illumination, resources) as independent, without modeling cross-interactions. This allows fast quantification to prioritize test sites, but has strict limitations. The model does not capture the effect of reduced gravity (0.16g), the total absence of atmosphere, lunar dust abrasiveness, or Shackleton crater's cryogenic vacuum conditions. Results should therefore be read as an indicator of logistics suitability for early-stage engineering trials, not as absolute geomorphological equivalence."</div>
+
+    <h3>Beyond this comparison</h3>
+    <p>Beyond this single comparison, the weighted framework is reusable — any future candidate Earth analog, for the Moon or Mars, can be scored the same way. This turns ad hoc site selection into a repeatable, data-driven process.</p>
+    <p>Next steps toward operational use: model cross-dimension interactions instead of treating them independently, and validate scores against in-situ engineering data as it becomes available.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap section-inner">
+    <p class="eyebrow">02</p>
+    <h2>Data, dimension by dimension</h2>
+    <p class="section-sub">Every figure behind the scorecard, with its source.</p>
+
+    <table>
+      <thead><tr><th>Dimension</th><th>Shackleton (Moon)</th><th>Svalbard (Earth)</th><th>Score</th></tr></thead>
+      <tbody>
+        <tr>
+          <td data-label="Dimension"><span class="tag blue">Water ice</span><br>weight 0.4</td>
+          <td data-label="Shackleton">Mini-RF radar: up to 5–10% H₂O by weight in the top meter of regolith — an upper bound, not a confirmed massive deposit.</td>
+          <td data-label="Svalbard">Permafrost at Bayelva/Kvadehuken: 5–40% ice by weight in the top 3m; active layer 0.9–1.1m. Solid, confirmed ice.</td>
+          <td data-label="Score" class="num-cell">1.00</td>
+        </tr>
+        <tr>
+          <td data-label="Dimension"><span class="tag green">Terrain</span><br>weight 0.3</td>
+          <td data-label="Shackleton">Crater Ø ~21km, depth ~4,200m, internal wall slopes ~30°, floor Ø 6.6km.</td>
+          <td data-label="Svalbard">Midtre Lovénbreen glacier floor is gentle (~4.6–5°), but its lateral moraines and the slopes of nearby Zeppelinfjellet run 25–30° — the closer match for mobility testing.</td>
+          <td data-label="Score" class="num-cell">0.72</td>
+        </tr>
+        <tr>
+          <td data-label="Dimension"><span class="tag yellow">Illumination</span><br>weight 0.3</td>
+          <td data-label="Shackleton">Rim peaks lit 80–90% of each lunar orbit; interior in true permanent shadow for billions of years.</td>
+          <td data-label="Svalbard">Ny-Ålesund (78.9°N): polar night ~Oct 24–Feb 18 (~115–117 days), polar day ~Apr 18–Aug 24. A seasonal cycle, not eternal darkness.</td>
+          <td data-label="Score" class="num-cell">0.31</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pullnote yellow"><strong>Where the ice score is softest:</strong> ShadowCam's preliminary pass found no exposed surface ice on Shackleton's floor. Mini-RF's detection limit sits around 20–30% by weight and cannot rule out ice at lower concentrations — Zuber et al. (2012) note the true amount could be zero. LCROSS's strongest confirmed water detection was at Cabeus crater, not Shackleton. The 1.00 score measures that the lunar range sits fully inside Svalbard's range — it is a test of whether ice-handling procedures can be rehearsed at all, not a claim that Shackleton's deposit matches Svalbard's in form. Svalbard's ice is solid and massive; Shackleton's, if present, is almost certainly trace-level and mixed into regolith, which would call for thermal sublimation rather than drilling.</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap section-inner">
+    <p class="eyebrow">03</p>
+    <h2>Score sensitivity</h2>
+    <p class="section-sub">Because the ice score carries the most uncertainty, here is how the overall index moves if it turns out lower.</p>
+    <table class="sens-table">
+      <thead><tr><th>If ice scores</th><th>Overall index</th></tr></thead>
+      <tbody>
+        <tr><td data-label="If ice scores">1.00 (as submitted)</td><td data-label="Overall index">70.9%</td></tr>
+        <tr><td data-label="If ice scores">0.70</td><td data-label="Overall index">58.9%</td></tr>
+        <tr><td data-label="If ice scores">0.50</td><td data-label="Overall index">50.9%</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.88rem; color:var(--ink-soft);">Terrain and illumination scores are held constant. The formula simplifies to <code>0.4 × ice + 0.309</code>.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap section-inner">
+    <p class="eyebrow">04</p>
+    <h2>Historical context</h2>
+    <p class="section-sub">The crater and the archipelago share more history than the comparison alone suggests.</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="yr">1918</span>
+        <p>Ernest Shackleton was offered command of a Northern Exploration Company expedition to Spitsbergen (Svalbard). He fell suddenly ill crossing the Arctic Circle for the first time, near Tromsø, and had to turn back; Frank Wild took over. Shackleton himself never reached Svalbard — the crater that bears his name did.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="yr">1912</span>
+        <p>Shackleton's ship <em>Endurance</em> was originally built as the <em>Polaris</em> for Belgian explorer Adrien de Gerlache, intended for a voyage to Spitsbergen. On the Moon, the ridge connecting Shackleton crater to the nearby de Gerlache crater is one of the Artemis program's priority landing sites.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="yr">1926</span>
+        <p>Roald Amundsen and Umberto Nobile departed Ny-Ålesund aboard the airship <em>Norge</em> on their flight to the North Pole. Both men have lunar craters named after them near the south pole; "Nobile Rim 1" is among the polar sites mapped by NASA Goddard.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="yr">1922 / 1928</span>
+        <p>Shackleton died aboard the <em>Quest</em> in 1922. That same ship took part in the 1928 rescue of survivors from the airship <em>Italia</em>, which had departed from Ny-Ålesund.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap section-inner">
+    <p class="eyebrow">05</p>
+    <h2>Precedent</h2>
+    <p class="section-sub">Using polar Earth environments as space-hardware test beds is not a new idea.</p>
+
+    <div class="precedent-card">
+      <h4>AMASE — Arctic Mars Analog Svalbard Expedition (2003–2011)</h4>
+      <p>Funded by NASA and ESA. Validated the SAM and CheMin instruments in Svalbard before they flew on the Curiosity rover to Mars.</p>
+    </div>
+    <div class="precedent-card">
+      <h4>Haughton-Mars Project — NASA / SETI Institute</h4>
+      <p>Devon Island, Canadian Arctic. Tests spacesuit and rover logistics under polar isolation, the same category of problem this project applies to Svalbard.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap section-inner">
+    <p class="eyebrow">06</p>
+    <h2>AI tools disclosure</h2>
+    <p>This project used Claude (Anthropic) throughout development: to research and cross-check open data sources (NASA LRO/Mini-RF studies, Norwegian Polar Institute, GTN-P), and to design and build the Lunar.Photo presentation page and this report. Gemini (Google) was used for a secondary deep-research pass: validating the gathered data, suggesting additional sources, proposing and stress-testing the weighted similarity-score methodology, and reviewing the project against NASA's own judging criteria. All factual claims were independently verified against cited primary sources before inclusion.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap section-inner">
+    <p class="eyebrow">07</p>
+    <h2>Sources</h2>
+
+    <span class="src-cat">Shackleton crater &amp; lunar ice</span>
+    <ul class="sources">
+      <li>Zuber, M. T. et al. (2012). <a href="https://ntrs.nasa.gov/api/citations/20120013758/downloads/20120013758.pdf" target="_blank" rel="noopener">Constraints on the volatile distribution within Shackleton crater</a>. NASA NTRS.</li>
+      <li>Thomson, B. J. et al. (2012). <a href="https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2012GL052119" target="_blank" rel="noopener">An upper limit for ice in Shackleton crater as revealed by LRO Mini-RF orbital radar</a>. Geophysical Research Letters.</li>
+      <li>Li, S. et al. (2018). <a href="https://doi.org/10.1073/pnas.1802345115" target="_blank" rel="noopener">Direct evidence of surface exposed water ice in the lunar polar regions</a>. PNAS.</li>
+      <li>Haruyama, J. et al. (2008). Kaguya observations of Shackleton crater. <a href="http://www.sciencemag.org/content/322/5903/938.full.pdf" target="_blank" rel="noopener">Science</a>.</li>
+      <li><a href="https://www.leonarddavid.com/?p=40190" target="_blank" rel="noopener">ShadowCam preliminary findings on Shackleton crater</a> — Leonard David.</li>
+      <li><a href="https://en.wikipedia.org/wiki/Shackleton_(crater)" target="_blank" rel="noopener">Shackleton (crater)</a> — Wikipedia, summary of LRO/Clementine findings.</li>
+      <li><a href="https://news.mit.edu/2012/shackletons-crater-0620" target="_blank" rel="noopener">MIT News: Researchers find evidence of ice content at the moon's south pole</a>.</li>
+    </ul>
+
+    <span class="src-cat">Lunar topography &amp; data tools</span>
+    <ul class="sources">
+      <li><a href="https://pgda.gsfc.nasa.gov/products/78" target="_blank" rel="noopener">PGDA / NASA Goddard — High-Resolution LOLA Topography, Lunar South Pole</a>.</li>
+      <li>Barker, M. (2021). <a href="https://ntrs.nasa.gov/api/citations/20210020639/downloads/leag2021_MikeBarker_v01_STI.pdf" target="_blank" rel="noopener">LOLA DEM uncertainty</a>. LEAG 2021.</li>
+      <li><a href="https://quickmap.lroc.im-ldi.com/" target="_blank" rel="noopener">Lunar QuickMap</a> — ASU/LROC, built on NASA LRO data.</li>
+      <li><a href="https://science.nasa.gov/mission/lro/" target="_blank" rel="noopener">NASA Lunar Reconnaissance Orbiter (LRO)</a>.</li>
+      <li><a href="https://www.diviner.ucla.edu/" target="_blank" rel="noopener">NASA LRO Diviner Lunar Data</a>.</li>
+      <li><a href="https://pds.nasa.gov/" target="_blank" rel="noopener">NASA Planetary Data System (PDS)</a>.</li>
+    </ul>
+
+    <span class="src-cat">Svalbard &amp; permafrost</span>
+    <ul class="sources">
+      <li><a href="https://en.wikipedia.org/wiki/Climate_of_Svalbard" target="_blank" rel="noopener">Climate of Svalbard</a> — Wikipedia.</li>
+      <li><a href="https://www.swisseduc.ch/glaciers/svalbard/midtre_lovenbreen/index-en.html" target="_blank" rel="noopener">Midtre Lovénbreen glacier</a> — SwissEduc Glaciers Online.</li>
+      <li>Boike, J. et al. (2018). <a href="https://essd.copernicus.org/articles/10/355/2018/" target="_blank" rel="noopener">A 20-year record of permafrost at Bayelva</a>. Earth System Science Data.</li>
+      <li>Westermann, S. &amp; Boike, J. (2019). <a href="https://epic.awi.de/id/eprint/50757" target="_blank" rel="noopener">Bayelva long-term observation site</a>. AWI.</li>
+      <li><a href="https://resolve.cambridge.org/core/product/74EFB5D95B74907FBE55DB61B49E8A78/core-reader" target="_blank" rel="noopener">Water budget and surface energy balance of Midre Lovénbreen</a>. Journal of Glaciology.</li>
+      <li><a href="https://nyalesundresearch.no/frequency-restrictions/" target="_blank" rel="noopener">Ny-Ålesund Research Station: frequency restrictions</a>.</li>
+      <li><a href="https://hjelp.yr.no/hc/en-us/articles/360008027114-Polar-nights-and-midnight-sun" target="_blank" rel="noopener">Yr: Polar nights and midnight sun</a>.</li>
+    </ul>
+
+    <span class="src-cat">Historical context</span>
+    <ul class="sources">
+      <li><a href="https://www.south-pole.com/p000098b" target="_blank" rel="noopener">Ernest H. Shackleton</a> — South-Pole.com.</li>
+      <li><a href="https://en.wikipedia.org/wiki/Endurance_Expedition" target="_blank" rel="noopener">Imperial Trans-Antarctic Expedition</a> — Wikipedia.</li>
+      <li><a href="https://frammuseum.no/polar-history/expeditions/the-norge-flight-1926/" target="_blank" rel="noopener">The Norge flight, 1926</a> — Fram Museum.</li>
+      <li><a href="https://frammuseum.no/blog/2024/06/12/breaking-shackletons-last-ship-the-norwegian-sealing-vessel-quest-discovered-in-the-labrador-sea/" target="_blank" rel="noopener">Shackleton's last ship, Quest, discovered</a> — Fram Museum.</li>
+    </ul>
+
+    <span class="src-cat">Precedent</span>
+    <ul class="sources">
+      <li>Arctic Mars Analog Svalbard Expedition (AMASE), NASA/ESA, 2003–2011.</li>
+      <li>Haughton-Mars Project, NASA/SETI Institute, Devon Island.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <a class="brand" href="https://www.lunar.photo/"><svg class="mark" viewBox="0 0 64 64"><circle cx="32" cy="34" r="24" fill="currentColor" mask="url(#crescent-site)"/></svg>lunar.photo</a>
+  <p>Submission for the NASA Space Apps Challenge 2026 — "Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars"</p>
+  <div class="links">
+    <a href="https://www.lunar.photo/">Interactive site</a>
+    <a href="https://github.com/anagonzalezlame/lunar-photo">Source code</a>
+  </div>
+</footer>
